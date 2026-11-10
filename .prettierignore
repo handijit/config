@@ -1,0 +1,5 @@
+build/
+coverage/
+package-lock.json
+# Copied into the smoke test's app project, which formats with the app style.
+scripts/smoke/app/

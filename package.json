@@ -1,0 +1,136 @@
+{
+  "name": "@handijit/config",
+  "version": "1.0.0",
+  "description": "The tooling configuration Han Dijit's @handijit/* packages and Electron desktop programs share: ESLint flat config, Prettier, TypeScript base configs, Vitest presets and dependency-cruiser rules, as a library preset and an app preset.",
+  "author": "Ahmet ilhan <ahmetilhan.dev@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/handijit/config.git"
+  },
+  "homepage": "https://github.com/handijit/config#readme",
+  "bugs": {
+    "url": "https://github.com/handijit/config/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "exports": {
+    "./eslint": {
+      "types": "./build/eslint.d.mts",
+      "default": "./build/eslint.mjs"
+    },
+    "./prettier": {
+      "types": "./build/prettier.d.mts",
+      "default": "./build/prettier.mjs"
+    },
+    "./prettier/app": {
+      "types": "./build/prettier-app.d.mts",
+      "default": "./build/prettier-app.mjs"
+    },
+    "./vitest": {
+      "types": "./build/vitest.d.mts",
+      "default": "./build/vitest.mjs"
+    },
+    "./vitest/setup": {
+      "types": "./build/vitest-setup.d.mts",
+      "default": "./build/vitest-setup.mjs"
+    },
+    "./dependency-cruiser": {
+      "types": "./build/dependency-cruiser.d.mts",
+      "default": "./build/dependency-cruiser.mjs"
+    },
+    "./tsconfig/*.json": "./tsconfig/*.json",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "./build/vitest-setup.mjs"
+  ],
+  "files": [
+    "build",
+    "tsconfig",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "sh ./scripts/prod-build.sh",
+    "dev": "sh ./scripts/dev-build.sh",
+    "lint": "eslint . --max-warnings 0 && prettier --check .",
+    "architecture": "depcruise lib --config .dependency-cruiser.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run --coverage",
+    "lint:package": "publint && attw --pack . --profile esm-only",
+    "smoke": "sh ./scripts/smoke-test.sh",
+    "verify": "npm run lint && npm run architecture && npm run typecheck && npm run test && npm run build && npm run lint:package && npm run smoke",
+    "prepublishOnly": "npm run verify"
+  },
+  "keywords": [
+    "handijit",
+    "config",
+    "eslint-config",
+    "eslint",
+    "flat-config",
+    "prettier",
+    "tsconfig",
+    "vitest",
+    "dependency-cruiser",
+    "electron"
+  ],
+  "private": false,
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import-x": "^4.18.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "typescript-eslint": "^8.72.2"
+  },
+  "peerDependencies": {
+    "@vitest/coverage-v8": "^5.1.0",
+    "dependency-cruiser": "^18.7.2",
+    "eslint": "^10.14.0",
+    "jsdom": "^31.0.0",
+    "prettier": "^3.9.10",
+    "typescript": "^6.0.2",
+    "vitest": "^5.1.0"
+  },
+  "peerDependenciesMeta": {
+    "@vitest/coverage-v8": {
+      "optional": true
+    },
+    "dependency-cruiser": {
+      "optional": true
+    },
+    "jsdom": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@rollup/plugin-typescript": "^12.3.1",
+    "@types/node": "^24.9.0",
+    "@types/react": "^19.2.0",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "@vitest/coverage-v8": "^5.1.0",
+    "dependency-cruiser": "^18.7.2",
+    "eslint": "^10.14.0",
+    "jiti": "^2.7.0",
+    "jsdom": "^31.0.0",
+    "prettier": "^3.9.10",
+    "publint": "^0.3.25",
+    "react": "^19.3.1",
+    "rollup": "^4.68.2",
+    "rollup-plugin-dts": "^6.5.1",
+    "tslib": "^2.9.1",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vitest": "^5.1.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true
+  },
+  "include": ["lib", "__tests__", "eslint.config.ts", "vitest.config.mts"],
+  "exclude": ["__tests__/fixtures"]
+}

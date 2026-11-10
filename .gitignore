@@ -1,0 +1,19 @@
+node_modules/
+build/
+coverage/
+*.tgz
+*.log
+npm-debug.log*
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.env
+.env.local
+e2e/out/
+
+# The fixtures' stand-in for electron is part of the tests; their scratch copies are not.
+!__tests__/fixtures/node_modules/
+__tests__/fixtures/.scratch-*
