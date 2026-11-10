@@ -1,0 +1,5 @@
+{
+  "extends": "@handijit/config/tsconfig/electron-node.json",
+  "include": ["src/main", "src/preload", "src/shared", "tests/unit/**/*.test.ts"],
+  "exclude": ["tests/unit/**/*.dom.test.ts"]
+}

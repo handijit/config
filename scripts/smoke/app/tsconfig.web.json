@@ -1,0 +1,4 @@
+{
+  "extends": "@handijit/config/tsconfig/electron-web.json",
+  "include": ["src/renderer/src", "src/shared", "tests/unit/**/*.dom.test.ts"]
+}

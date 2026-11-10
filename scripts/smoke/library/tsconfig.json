@@ -1,0 +1,6 @@
+{
+  "extends": "@handijit/config/tsconfig/library.json",
+  "compilerOptions": {
+    "types": ["node"]
+  }
+}
