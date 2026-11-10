@@ -212,9 +212,14 @@ const library = ({
           .map((other) =>
             forbid(
               `${name}-not-to-${other.name}`,
-              "Each layer is its own entry; share code through a shared layer instead.",
+              "Each layer is its own entry; share code through a shared layer instead. " +
+                "An import by the package's published name, which tsconfig paths point back " +
+                "at the source, is how one entry builds on another and stays external.",
               { path },
-              { path: other.path }
+              {
+                path: other.path,
+                dependencyTypesNot: ["aliased-tsconfig-paths"],
+              }
             )
           ),
       ]),

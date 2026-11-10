@@ -80,6 +80,23 @@ describe("the dependency-cruiser library preset", () => {
       'import { isVisible } from "../renderer";\nimport { helper } from "../../__tests__/helper";\nimport { missing } from "./missing";\nimport { p } from "../shared/platform";\nexport const r = (): unknown => [isVisible, helper, missing, p];\n'
     );
     write(copy.dir, "__tests__/helper.ts", "export const helper = 1;\n");
+    // One entry building on another by the package's published name is allowed.
+    write(
+      copy.dir,
+      "tsconfig.json",
+      JSON.stringify({
+        extends: "../../../tsconfig/library.json",
+        compilerOptions: {
+          types: ["node"],
+          paths: { "fixture-library/renderer": ["./lib/renderer.ts"] },
+        },
+      })
+    );
+    write(
+      copy.dir,
+      "lib/main/by-name.ts",
+      'import { isVisible } from "fixture-library/renderer";\nimport { r } from "./reach";\nexport const byName = (): unknown => [isVisible, r];\n'
+    );
     write(
       copy.dir,
       "lib/renderer/page.ts",
@@ -113,6 +130,7 @@ describe("the dependency-cruiser library preset", () => {
         line.startsWith("no-non-package-json: lib/renderer/page.ts")
       )
     ).toBe(true);
+    expect(found.filter((line) => line.includes("by-name"))).toEqual([]);
   });
 
   it("needs no options", () => {
