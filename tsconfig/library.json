@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Han Dijit library (an @handijit/* npm package)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["${configDir}/lib"],
+  "exclude": ["${configDir}/node_modules", "${configDir}/build"]
+}

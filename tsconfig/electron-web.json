@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Han Dijit Electron app: renderer and shared",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "noEmit": true,
+    "paths": {
+      "@/*": ["${configDir}/src/renderer/src/*"],
+      "@shared/*": ["${configDir}/src/shared/*"]
+    }
+  },
+  "include": ["${configDir}/src/renderer/src", "${configDir}/src/shared"]
+}
