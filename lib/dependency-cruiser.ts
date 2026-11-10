@@ -53,6 +53,13 @@ type AppOptions = {
 
 const ELECTRON = "(^|/)node_modules/electron/|^electron(/|$)";
 const REACT = "(^|/)node_modules/react(-dom)?/|^react(-dom)?(/|$)";
+/**
+ * The `/preload` entries of the house packages a program's preload has to use (the bridge of
+ * `@handijit/electron`, the channel helpers of `auth`, `subscription` and `electron-update`). They
+ * import nothing and are bundled into the one file the sandboxed preload is.
+ */
+const HOUSE_PRELOAD_ENTRIES =
+  "(^|/)node_modules/@handijit/(electron|auth|subscription|electron-update)/build/preload\\.|^@handijit/(electron|auth|subscription|electron-update)/preload$";
 const NPM: NonNullable<IRegularForbiddenRuleType["to"]["dependencyTypes"]> = [
   "npm",
   "npm-dev",
@@ -266,12 +273,12 @@ const app = ({
     ),
     forbid(
       "preload-only-electron",
-      "A sandboxed preload can require only electron.",
+      "A sandboxed preload can require only electron and the house packages' preload entries.",
       { path: preload },
       {
         dependencyTypes: NPM,
         dependencyTypesNot: ["type-only"],
-        pathNot: ELECTRON,
+        pathNot: [ELECTRON, HOUSE_PRELOAD_ENTRIES],
       }
     ),
     forbid(

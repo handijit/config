@@ -204,3 +204,36 @@ describe("the dependency-cruiser app preset", () => {
     ).toBe(true);
   });
 });
+
+describe("the app preset's preload rule", () => {
+  const rule = app().forbidden?.find(
+    (item) => item.name === "preload-only-electron"
+  );
+  const allowed = (path: string): boolean =>
+    [rule && "to" in rule ? (rule.to.pathNot ?? []) : []]
+      .flat()
+      .some((pattern) => new RegExp(pattern).test(path));
+
+  it("lets the preload use electron and the house packages' preload entries", () => {
+    expect(allowed("node_modules/electron/index.js")).toBe(true);
+    expect(allowed("node_modules/@handijit/electron/build/preload.cjs")).toBe(
+      true
+    );
+    expect(
+      allowed("../node_modules/@handijit/subscription/build/preload.js")
+    ).toBe(true);
+    expect(
+      allowed("node_modules/@handijit/electron-update/build/preload.mjs")
+    ).toBe(true);
+    expect(allowed("@handijit/auth/preload")).toBe(true);
+  });
+
+  it("keeps every other package out of the preload", () => {
+    expect(allowed("node_modules/@handijit/electron/build/main.js")).toBe(
+      false
+    );
+    expect(allowed("node_modules/@handijit/ui/build/preload.js")).toBe(false);
+    expect(allowed("node_modules/zod/index.js")).toBe(false);
+    expect(allowed("@handijit/subscription")).toBe(false);
+  });
+});

@@ -1,6 +1,6 @@
 {
   "name": "@handijit/config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The tooling configuration Han Dijit's @handijit/* packages and Electron desktop programs share: ESLint flat config, Prettier, TypeScript base configs, Vitest presets and dependency-cruiser rules, as a library preset and an app preset.",
   "author": "Ahmet ilhan <ahmetilhan.dev@gmail.com>",
   "license": "MIT",

@@ -7,6 +7,15 @@ and the package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-10
+
+### Fixed
+
+- `@handijit/config/dependency-cruiser`: the app preset's `preload-only-electron`
+  rule now lets the preload import the `/preload` entries of `@handijit/electron`,
+  `@handijit/auth`, `@handijit/subscription` and `@handijit/electron-update`, which
+  every program's preload needs; any other package is still refused.
+
 ## [1.0.0] - 2026-11-10
 
 First release: the tooling configuration the `@handijit/*` packages and the
@@ -40,5 +49,6 @@ tsconfig presets (`./tsconfig/*.json`), as typed ES modules.
   cycles, no orphans, nothing unresolvable, no unlisted package, no dev-only
   dependency in a package's source, and the layer rule on resolved paths.
 
-[Unreleased]: https://github.com/handijit/config/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/handijit/config/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/handijit/config/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/handijit/config/releases/tag/v1.0.0
