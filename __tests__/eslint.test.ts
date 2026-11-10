@@ -1,6 +1,9 @@
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+
 import { ESLint } from "eslint";
 import type { Linter } from "eslint";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
   app,
@@ -12,7 +15,7 @@ import {
 } from "../lib/eslint";
 import type { LibraryLayer } from "../lib/eslint";
 
-import { fixture } from "./helpers";
+import { copyFixture, fixture } from "./helpers";
 
 const LIBRARY = fixture("library");
 const APP = fixture("app");
@@ -28,8 +31,24 @@ const LAYERS: Record<string, LibraryLayer> = {
   renderer: { environment: "renderer" },
 };
 
+// Most tests lint text that is not what the file on disk holds. typescript-eslint's single-run
+// mode, which it switches on by itself when CI=true or under the eslint CLI, builds each
+// TypeScript program once from disk and never updates it, so the types would describe the old
+// file. The tests therefore opt out of that inference; "lints files on disk in single-run
+// mode" below covers the mode itself, the way the CLI uses it.
+const WATCHED_PROGRAMS: Linter.Config = {
+  name: "test/watched-programs",
+  languageOptions: {
+    parserOptions: { disallowAutomaticSingleRunInference: true },
+  },
+};
+
 const eslintFor = (cwd: string, config: Linter.Config[]): ESLint =>
-  new ESLint({ cwd, overrideConfigFile: true, overrideConfig: config });
+  new ESLint({
+    cwd,
+    overrideConfigFile: true,
+    overrideConfig: [...config, WATCHED_PROGRAMS],
+  });
 
 const libraryConfig = (
   options: Partial<Parameters<typeof library>[0]> = {}
@@ -270,6 +289,32 @@ describe("the library preset", () => {
         { name: "document", message: "This layer must run without a DOM." },
       ],
     });
+  });
+
+  it("lints files on disk in single-run mode, as CI and the CLI do", async () => {
+    vi.stubEnv("CI", "true");
+    const copy = copyFixture("library");
+    try {
+      writeFileSync(
+        join(copy.dir, "lib", "main", "fire.ts"),
+        'import { readVersion } from "./version";\n\nexport const fire = (): void => {\n  readVersion();\n};\n'
+      );
+      const single = new ESLint({
+        cwd: copy.dir,
+        overrideConfigFile: true,
+        overrideConfig: library({ rootDir: copy.dir, layers: LAYERS }),
+      });
+      const results = await single.lintFiles(["."]);
+      expect(
+        results.flatMap(({ filePath, messages }) =>
+          messages.map(
+            ({ ruleId }) => `${filePath.slice(copy.dir.length)} ${ruleId}`
+          )
+        )
+      ).toEqual(["/lib/main/fire.ts @typescript-eslint/no-floating-promises"]);
+    } finally {
+      copy.remove();
+    }
   });
 
   it("works without layers or options", async () => {
