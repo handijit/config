@@ -3,10 +3,13 @@ import { fileURLToPath } from "node:url";
 
 import type { ViteUserConfig } from "vitest/config";
 
-// The setup file sits next to this module: `vitest-setup.mjs` once built, `.ts` in the source.
-const SETUP = fileURLToPath(
-  new URL(`./vitest-setup${extname(import.meta.url)}`, import.meta.url)
-);
+// The setup files sit next to this module: `.mjs` once built, `.ts` in the source.
+const sibling = (name: string): string =>
+  fileURLToPath(
+    new URL(`./${name}${extname(import.meta.url)}`, import.meta.url)
+  );
+const SETUP = sibling("vitest-setup");
+const COVERAGE_GUARD = sibling("vitest-coverage");
 
 /** Coverage percentages below which `vitest run --coverage` fails. */
 type Thresholds = {
@@ -53,7 +56,8 @@ type AppOptions = {
 
 /**
  * What every suite shares: tests in node, `*.dom.test.*` in jsdom; mocks, stubbed globals and
- * environment variables reset between tests, so no test sees another's leftovers.
+ * environment variables reset between tests, so no test sees another's leftovers; and a run
+ * with coverage fails when the coverage include matches no file.
  */
 const common = (
   tests: string,
@@ -83,6 +87,7 @@ const common = (
   unstubGlobals: true,
   unstubEnvs: true,
   setupFiles: [SETUP, ...setupFiles],
+  globalSetup: [COVERAGE_GUARD],
 });
 
 /**

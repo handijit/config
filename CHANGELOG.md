@@ -7,6 +7,22 @@ and the package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-27
+
+### Fixed
+
+- `@handijitcom/config/vitest`: a run with coverage no longer passes on 0 of 0
+  files. Both presets load a global setup file that fails the run before any
+  test when `coverage.include`, less `coverage.exclude`, matches no file (a
+  wrong `source`, a mistyped glob, barrels that swallow the whole source).
+  Vitest used to report such a run as `Unknown% ( 0/0 )` and let the 100 %
+  gate through. A run without coverage is unaffected.
+
+### Changed
+
+- `ci.yml` also runs on every push to a branch other than `master`
+  (`NPM_PACKAGE.md` section 14); the README's CI section shows the triggers.
+
 ## [1.0.0] - 2026-11-27
 
 First release under the `@handijitcom` npm organization. The package is a port
@@ -41,5 +57,6 @@ line restarts at 1.0.0.
 - README: adopting the presets in an existing package, and the CI matrix every
   `@handijitcom` repository uses.
 
-[Unreleased]: https://github.com/handijit/config/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/handijit/config/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/handijit/config/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/handijit/config/releases/tag/v1.0.0

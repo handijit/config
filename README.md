@@ -306,7 +306,9 @@ error as well. Nothing in them is an option TypeScript 7 removed.
 **Vitest**: tests in node, `*.dom.test.*` in jsdom; mocks cleared and restored, stubbed globals
 and environment variables undone after each test; real timers restored after each test by the
 house setup file, even after a test that failed on fake ones. A library's coverage gate is
-100 %, with barrels and type-only files left out.
+100 %, with barrels and type-only files left out. A run with coverage fails before any test when
+the coverage include, less the excludes, matches no file: Vitest would otherwise report 0 of 0
+lines as covered and pass the gate on source it never measured.
 
 **Prettier**: the library style (double quotes, ES5 trailing commas, 80 columns, parenthesised
 arrow parameters) is the default export of `@handijitcom/config/prettier`; the app style (single
@@ -382,7 +384,9 @@ behaviour, left out of coverage; default `<source>/index.ts` and `<source>/types
 store), `setupFiles`.
 
 Both return a plain Vitest config; combine with the repository's own through `mergeConfig`.
-`@handijitcom/config/vitest/setup` is the house setup file, which both load.
+`@handijitcom/config/vitest/setup` is the house setup file, which both load. Both also load a
+global setup file that, when coverage is on, fails the run if `coverage.include` less
+`coverage.exclude` matches no file.
 
 ### `@handijitcom/config/dependency-cruiser`
 
@@ -395,9 +399,8 @@ Both return a plain Vitest config; combine with the repository's own through `me
 
 ## Adopting it in an existing package
 
-The house packages (`utils`, `memoizer`, `tr`, `barcode`, `api-client`, `electron`) carry the
-same configuration by hand. Switching one of them over, taking `@handijitcom/utils` as the
-example:
+Switching a package that carries this configuration by hand over to the presets, taking
+`@handijitcom/utils` as the example:
 
 1. **`package.json`**: add `@handijitcom/config` to `devDependencies` and drop `@eslint/js`,
    `eslint-config-prettier` and `typescript-eslint` (they come with this package). Keep `eslint`,
@@ -457,10 +460,16 @@ linted with ESLint's recommended rules, and Vitest also undoes stubbed environme
 ## CI matrix
 
 Every `@handijitcom` repository verifies on two Node lines (`NPM_PACKAGE.md` section 14): the
-**engines floor** (`engines.node` in `package.json`) and the **current Active LTS**. On a
-`ci.yml` that is:
+**engines floor** (`engines.node` in `package.json`) and the **current Active LTS**. `ci.yml` runs on every pull request and every push to a branch other than
+`master` (a push to `master` is verified by `publish.yml`):
 
 ```yaml
+on:
+  pull_request:
+  push:
+    branches-ignore: [master]
+  workflow_dispatch:
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -507,7 +516,8 @@ npm run verify   # lint, architecture, typecheck, tests (100 % coverage), build,
 ```
 
 - `lib/` is the source: `eslint/` (globs, blocks, patterns, layers, the two presets) behind the
-  `eslint.ts` barrel, `prettier.ts`, `vitest.ts`, `vitest-setup.ts`, `dependency-cruiser.ts`.
+  `eslint.ts` barrel, `prettier.ts`, `vitest.ts`, `vitest-setup.ts`, `vitest-coverage.ts` (the
+  coverage guard, built next to `vitest.mjs` but not an entry), `dependency-cruiser.ts`.
   `tsconfig/` ships as written.
 - The repository lints, formats, cruises and tests itself with its own presets, loaded from the
   source (through `jiti` where a tool reads plain JavaScript).

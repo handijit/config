@@ -149,6 +149,23 @@ const { total } = JSON.parse(require("node:fs").readFileSync("coverage/coverage-
 if (total.lines.total === 0 || total.lines.pct !== 100) throw new Error("coverage measured nothing");
 '
 
+echo "smoke: vitest refuses a coverage gate that would measure nothing"
+cat > vitest.empty.config.mts <<'JS'
+import { library } from "@handijitcom/config/vitest";
+
+export default library({ source: "missing" });
+JS
+if ./node_modules/.bin/vitest run --coverage --config vitest.empty.config.mts > empty.log 2>&1; then
+  echo "smoke: a coverage include that matched no file passed the gate" >&2
+  exit 1
+fi
+if ! grep -q "Coverage would measure no file" empty.log; then
+  cat empty.log >&2
+  echo "smoke: the empty-coverage run failed for another reason" >&2
+  exit 1
+fi
+rm vitest.empty.config.mts empty.log
+
 echo "smoke: dependency-cruiser"
 ./node_modules/.bin/depcruise lib --config .dependency-cruiser.mjs
 

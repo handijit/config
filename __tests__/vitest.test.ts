@@ -7,6 +7,9 @@ import { describe, expect, test } from "vitest";
 import { app, library } from "../lib/vitest";
 
 const SETUP = fileURLToPath(new URL("../lib/vitest-setup.ts", import.meta.url));
+const COVERAGE_GUARD = fileURLToPath(
+  new URL("../lib/vitest-coverage.ts", import.meta.url)
+);
 
 const projects = (tests: string): unknown[] => [
   {
@@ -42,6 +45,7 @@ describe("vitest library preset", () => {
         projects: projects("__tests__"),
         ...RESET,
         setupFiles: [SETUP],
+        globalSetup: [COVERAGE_GUARD],
         coverage: {
           provider: "v8",
           include: ["lib/**/*.{ts,tsx}"],
@@ -51,6 +55,7 @@ describe("vitest library preset", () => {
       },
     });
     expect(existsSync(SETUP)).toBe(true);
+    expect(existsSync(COVERAGE_GUARD)).toBe(true);
   });
 
   test("should honour every option", () => {
@@ -66,6 +71,7 @@ describe("vitest library preset", () => {
         projects: projects("test"),
         ...RESET,
         setupFiles: [SETUP, "./vitest.setup.ts"],
+        globalSetup: [COVERAGE_GUARD],
         coverage: {
           provider: "v8",
           include: ["src/**/*.{ts,tsx}"],
@@ -99,6 +105,7 @@ describe("vitest app preset", () => {
         projects: projects("tests/unit"),
         ...RESET,
         setupFiles: [SETUP],
+        globalSetup: [COVERAGE_GUARD],
         coverage: {
           provider: "v8",
           include: [
@@ -125,6 +132,7 @@ describe("vitest app preset", () => {
     expect(config.test).toMatchObject({
       projects: projects("spec"),
       setupFiles: [SETUP, "./setup.ts"],
+      globalSetup: [COVERAGE_GUARD],
       coverage: { include: ["src/shared/**/*.ts"], thresholds },
     });
   });
