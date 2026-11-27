@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig/library.json",
+  "compilerOptions": {
+    // The presets run in Node, inside ESLint, Vitest and dependency-cruiser: no DOM, Node types.
+    "lib": ["ES2023"],
+    "types": ["node"]
+  }
+}

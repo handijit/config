@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    // vitest.config.mts imports the preset with its extension, as Vite's native config loader
+    // (Node's own type stripping) requires.
+    "allowImportingTsExtensions": true
+  },
+  "include": ["lib", "__tests__", "vitest.config.mts"],
+  // The fixtures are inputs of the tests (some break rules on purpose), not part of the program.
+  "exclude": ["node_modules", "build", "__tests__/fixtures"]
+}

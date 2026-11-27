@@ -1,0 +1,41 @@
+# Han Dijit standard CI for @handijitcom packages, with the Node matrix of NPM_PACKAGE.md section 14.
+name: CI
+
+# Pull requests only. A push to master is gated by `publish.yml`, which runs the same commands
+# before anything reaches the registry.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # The engines floor (package.json) and the current Active LTS.
+        node-version: ["24", "26"]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      # Dependency lifecycle scripts are an arbitrary-code-execution path during install.
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # lint (ESLint + Prettier) → architecture → typecheck → test → build → lint:package → smoke
+      - name: Verify
+        run: npm run verify
